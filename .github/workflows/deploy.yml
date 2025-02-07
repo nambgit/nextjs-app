@@ -37,13 +37,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
-      #- name: Verify
-        #run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Verify
+        run: echo ${{ steps.docker_build.outputs.digest }}
+        
       - name: Setup SSH Connection
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github-actions-key
+          chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           
       - name: Deploy to server
