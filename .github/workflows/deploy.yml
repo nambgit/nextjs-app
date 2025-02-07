@@ -39,7 +39,7 @@ jobs:
 
       - name: Verify
         run: echo ${{ steps.docker_build.outputs.digest }}
-        
+
       - name: Setup SSH Connection
         run: |
           mkdir -p ~/.ssh
@@ -49,7 +49,7 @@ jobs:
           
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no \
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
           docker pull ${{ steps.meta.outputs.tags }}
