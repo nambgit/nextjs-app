@@ -54,9 +54,9 @@ jobs:
         run: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-        script: |
+
           docker pull ${{ steps.meta.outputs.tags }}
 
-          docker rm -f lab-nextjs &>/dev/null
+#          docker rm -f lab-nextjs &>/dev/null
 
           docker run -it -d --name lab-nextjs -p 3000:3000 ${{ steps.meta.outputs.tags }}
