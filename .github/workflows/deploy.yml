@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/200lab-nextjs # Change this to your docker image name
+          images: ${{ secrets.DOCKER_USERNAME }}/lab-nextjs # Change this to your docker image name
 
       - name: Build and push to docker hub
         uses: docker/build-push-action@v6
