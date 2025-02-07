@@ -38,7 +38,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
       - name: Deploy to server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }} # Địa chỉ của server
           username: ${{ secrets.USERNAME }} # Username để login vào server
