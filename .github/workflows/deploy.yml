@@ -2,7 +2,7 @@ name: "Build and deploy to server"
 
 on:
   push:
-    # Chúng ta sẽ chạy khi chúng ta release một version mới
+    # Chúng ta sẽ chạy khi chúng ta release một version mới.
     tags:
       - "v*"
 
