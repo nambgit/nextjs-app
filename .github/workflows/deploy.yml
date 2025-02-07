@@ -57,9 +57,7 @@ jobs:
 
           docker pull ${{ steps.meta.outputs.tags }}
 
-          docker stop lab-nextjs
-
-          docker rm lab-nextjs
+          docker rm -f lab-nextjs
 
           docker run -it -d --name lab-nextjs -p 3000:3000 ${{ steps.meta.outputs.tags }}
 
