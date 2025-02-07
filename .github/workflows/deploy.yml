@@ -47,8 +47,8 @@ jobs:
           chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           
-      - name: Test SSH Connection
-        run: ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
+  #    - name: Test SSH Connection
+  #      run: ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
 
       - name: Deploy to server
         run: |
