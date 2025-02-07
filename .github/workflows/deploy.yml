@@ -60,3 +60,5 @@ jobs:
 #          docker rm -f lab-nextjs &>/dev/null
 
           docker run -it -d --name lab-nextjs -p 3000:3000 ${{ steps.meta.outputs.tags }}
+
+          EOF
