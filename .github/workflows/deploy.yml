@@ -55,11 +55,11 @@ jobs:
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
+          docker rm -f lab-nextjs &> /dev/null
+
           docker rmi ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
 
           docker pull ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
-
-          docker rm -f lab-nextjs &> /dev/null
 
           docker run -it -d --name lab-nextjs -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
 
