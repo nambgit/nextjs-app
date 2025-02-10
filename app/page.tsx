@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Version 0.1.4
+            Version 0.1.5
           </a>
         </div>
       </main>
