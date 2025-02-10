@@ -66,7 +66,8 @@ jobs:
           EOF
     
     # If deployment fails, trigger failure notification
-    if: failure()
+  notify_failure:
+    name: Send Failure Email
     needs: deploy
     runs-on: ubuntu-latest
     steps:
