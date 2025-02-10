@@ -2,6 +2,7 @@ name: "Build and deploy to server"
 
 on:
   push:
+    baranch: [ master ]
     # Chúng ta sẽ chạy khi chúng ta release một version mới
     tags:
       - "v*"
@@ -31,14 +32,16 @@ jobs:
           images: ${{ secrets.DOCKER_USERNAME }}/lab-nextjs # Change this to your docker image name
 
       - name: Build and push to docker hub
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+        run:
+          chmod +x ./build.sh && ./build.sh 32
+        #uses: docker/build-push-action@v6
+        #with:
+          #context: .
+          #push: true
+          #tags: ${{ steps.meta.outputs.tags }}
 
-      - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      #- name: Verify
+        #run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Setup SSH Connection
         run: |
@@ -47,18 +50,15 @@ jobs:
           chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
           
-  #    - name: Test SSH Connection
-  #      run: ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "echo 'SSH Connection Successful'"
+      #- name: Deploy to server
+        #run: |
+          #ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
+          #${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
-      - name: Deploy to server
-        run: |
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
-          ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          #docker pull ${{ steps.meta.outputs.tags }}
 
-          docker pull ${{ steps.meta.outputs.tags }}
+          #docker rm -f lab-nextjs
 
-          docker rm -f lab-nextjs
+          #docker run -it -d --name lab-nextjs -p 3000:3000 ${{ steps.meta.outputs.tags }}
 
-          docker run -it -d --name lab-nextjs -p 3000:3000 ${{ steps.meta.outputs.tags }}
-
-          EOF
+          #EOF
