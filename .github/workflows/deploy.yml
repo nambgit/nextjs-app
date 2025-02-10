@@ -70,6 +70,7 @@ jobs:
     name: Send Failure Email
     needs: deploy
     runs-on: ubuntu-latest
+    if: ${{ failure() }}
     steps:
       - name: Send Failure Email
         uses: dawidd6/action-send-mail@v3
@@ -91,7 +92,7 @@ jobs:
     name: Notify Success Email
     needs: deploy
     runs-on: ubuntu-latest
-    if: success()
+    if: ${{ success() }}
     steps:
       - name: Send Success Email
         uses: dawidd6/action-send-mail@v3
