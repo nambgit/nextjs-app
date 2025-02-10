@@ -10,8 +10,8 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '#' | sed 's/\r$//' | awk '/=/ {print $1}' )
 fi
 
-docker build -t $IMAGE_NAME:$VERSION . &&
-docker build -t $IMAGE_NAME:latest . &&
+docker build --no-cache -t $IMAGE_NAME:$VERSION . &&
+docker build --no-cache -t $IMAGE_NAME:latest . &&
 docker push $IMAGE_NAME:$VERSION && 
 docker push $IMAGE_NAME:latest &&
 #echo $BMK_VERSION $END_POINT
