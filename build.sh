@@ -2,6 +2,7 @@ END_POINT=$1
 TAG=$2
 VERSION=$(git rev-parse --verify HEAD)
 IMAGE_NAME=nambgit/lab-nextjs$TAG
+IMAGE_TAG=$(date +%Y%m%d%H%M%S)
 #IMAGE_NAME=ghcr.io/ascension-six/backmarket$TAG
 
 echo "Build docker image name " $IMAGE_NAME:$VERSION
@@ -12,6 +13,7 @@ fi
 
 docker build --no-cache -t $IMAGE_NAME:$VERSION . &&
 docker build --no-cache -t $IMAGE_NAME:latest . &&
+docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest &&
 docker push $IMAGE_NAME:$VERSION && 
 docker push $IMAGE_NAME:latest &&
 #echo $BMK_VERSION $END_POINT

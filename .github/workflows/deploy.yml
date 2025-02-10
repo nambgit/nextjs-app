@@ -65,7 +65,32 @@ jobs:
 
           EOF
     
-    # If deployment fails, trigger failure notification
+  # Roll back to the previous version if deployment fails
+  rollback:
+    name: Rollback on Failure
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Rollback to Previous Version
+        run: |
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
+          ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+
+          PREVIOUS_TAG=$(docker images --format "{{.Tag}}" | grep -E "v[0-9]+\.[0-9]+\.[0-9]+" | sort -V | tail -n 2 | head -n 1)
+            if [ -z "$PREVIOUS_TAG" ]; then
+              echo "No previous version found, rollback failed."
+              exit 1
+            fi
+
+          docker pull ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:$PREVIOUS_TAG
+            docker rm -f lab-nextjs || true
+            docker run -it -d --name lab-nextjs -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:$PREVIOUS_TAG
+            echo "Rollback successful to version $PREVIOUS_TAG"
+
+          EOF
+
+  # If deployment fails, trigger failure notification
   notify_failure:
     name: Send Failure Email
     needs: deploy
