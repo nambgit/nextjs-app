@@ -64,3 +64,45 @@ jobs:
           docker run -it -d --name lab-nextjs -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
 
           EOF
+    
+    # If deployment fails, trigger failure notification
+    if: failure()
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Failure Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "❌ NextJS Deployment Failed: ${{ github.repository }}"
+          body: "The deployment of ${{ github.repository }} failed. Check logs for details."
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          content_type: text/html
+          attachments: |
+            ./build.log
+
+  # If deployment is successful, trigger success notification
+  notify_success:
+    name: Notify Success Email
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Send Success Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "✅ NextJS Deployment Successful: ${{ github.repository }}"
+          body: "The deployment of ${{ github.repository }} was successful."
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          content_type: text/html
+          attachments: |
+            ./build.log
