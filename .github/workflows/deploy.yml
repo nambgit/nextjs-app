@@ -40,7 +40,8 @@ jobs:
           #push: true
           #tags: ${{ steps.meta.outputs.tags }}
 
-      #- name: Verify
+      - name: Output Latest Docker Image Tag
+        run: echo ${{ steps.meta.outputs.tags }}
         #run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Setup SSH Connection
