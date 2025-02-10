@@ -2,10 +2,10 @@ name: "Build and deploy to server"
 
 on:
   push:
-    baranch: [ master ]
-    # Chúng ta sẽ chạy khi chúng ta release một version mới
+    baranches:
+      - master # Run when we push to master branch
     tags:
-      - "v*"
+      - "v*" # Run when we push a tag that matches the pattern v*
 
 jobs:
   deploy:
@@ -29,7 +29,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/lab-nextjs # Change this to your docker image name
+          images: ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
 
       - name: Build and push to docker hub
         #run:
@@ -39,10 +39,10 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs }}
 
       - name: Output Latest Docker Image Tag
         run: echo ${{ steps.meta.outputs.tags }}
-        #run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: Setup SSH Connection
         run: |
