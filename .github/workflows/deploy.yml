@@ -42,9 +42,6 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:latest
             ${{ steps.meta.outputs.tags }}
 
-      - name: Output Latest Docker Image Tag
-        run: echo ${{ steps.meta.outputs.tags }}
-
       - name: Setup SSH Connection
         run: |
           mkdir -p ~/.ssh
