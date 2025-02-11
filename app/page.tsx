@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Add Deployment Notification Email
+          Add Snyk to scan Vulneribilities
           </a>
         </div>
       </main>
