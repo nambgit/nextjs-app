@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Add Scan Docker Image
+          Add SNYK Scan Docker Image
           </a>
         </div>
       </main>
