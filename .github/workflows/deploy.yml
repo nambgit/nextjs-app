@@ -71,11 +71,11 @@ jobs:
 
           docker rmi ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
 
-          docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
 
           docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
-          docker run -it -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
+          docker run -it -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
 
           EOF
 
