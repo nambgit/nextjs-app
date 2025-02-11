@@ -64,19 +64,16 @@ jobs:
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Instance
-        run: |
+        script: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-
-          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
-
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           docker stop ${{ env.INSTANCE_NAME }} || true
-
           docker rm ${{ env.INSTANCE_NAME }} || true
-
-          docker run -it -d --name ${{ env.INSTANCE_NAME }} -p 3000:3000 ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
-
-          EOF
+          docker run -d \
+            --name ${{ env.INSTANCE_NAME }} \
+            -p 3000:3000 \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
 
       - name: Update Latest Tag
         if: ${{ github.event.inputs.rollback_tag == '' }}
