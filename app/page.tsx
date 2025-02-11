@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Add Snyk to scan Vulneribilities
+          Add Scan Docker Image
           </a>
         </div>
       </main>

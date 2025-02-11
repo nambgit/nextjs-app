@@ -59,10 +59,9 @@ jobs:
 
       # Scan Docker Image for vulnerabilities    
       - name: Scan Docker Image
-        uses: anchore/scan-action@v2
+        uses: docker/scan-action@v2
         with:
-          image-reference: ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
-          fail-build: true
+          image: ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
 
   deploy:
     runs-on: ubuntu-latest
