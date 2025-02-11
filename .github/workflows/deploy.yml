@@ -67,13 +67,11 @@ jobs:
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
-          docker rm -f ${{ env.IMAGE_NAME }} &> /dev/null
-
-          docker rmi ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}
-
           docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
 
-          docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker stop ${{ env.IMAGE_NAME }} || true
+
+          docker rm ${{ env.IMAGE_NAME }} || true
 
           docker run -it -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
 
