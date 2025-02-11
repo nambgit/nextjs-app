@@ -10,10 +10,11 @@ on:
         required: false
 
 env:
+  DOCKER_REGISTRY: docker.io
   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  REPOSITORY: ${{ env.DOCKERHUB_USERNAME }}/lab-nextjs
+  INSTANCE_NAME: lab-nextjs
   IMAGE_NAME: lab-nextjs
-  STACK_NAME: lab-nextsj-stack
-  SERVICE_NAME: lab-nextsj-stack-service
 
 jobs:
   build-push:
@@ -43,13 +44,13 @@ jobs:
           fi
       - name: Build and Push
         if: ${{ github.event.inputs.rollback_tag == '' }}
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: |
-            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.image_tag }}
-            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -62,18 +63,24 @@ jobs:
           chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Google Cloud Compute Engine
+      - name: Scan Docker Image
+        uses: docker/scan-action@v2
+        with:
+          image: ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
+
+
+      - name: Deploy to Instance
         run: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
 
-          docker pull ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
 
-          docker stop ${{ env.IMAGE_NAME }} || true
+          docker stop ${{ env.INSTANCE_NAME }} || true
 
-          docker rm ${{ env.IMAGE_NAME }} || true
+          docker rm ${{ env.INSTANCE_NAME }} || true
 
-          docker run -it -d --name ${{ env.IMAGE_NAME }} -p 3000:3000 ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }}
+          docker run -it -d --name ${{ env.INSTANCE_NAME }} -p 3000:3000 ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
 
           EOF
 
