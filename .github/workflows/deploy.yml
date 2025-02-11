@@ -109,6 +109,8 @@ jobs:
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_FROM }}
           content_type: text/html
+          attachments: |
+            ./build.log
 
   # If deployment is successful, trigger success notification
   notify_success:
@@ -129,3 +131,5 @@ jobs:
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_FROM }}
           content_type: text/html
+          attachments: |
+            ./build.log
