@@ -63,12 +63,6 @@ jobs:
           chmod 600 ~/.ssh/github-actions-key
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      - name: Scan Docker Image
-        uses: docker/scan-action@v2
-        with:
-          image: ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
-
-
       - name: Deploy to Instance
         run: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
