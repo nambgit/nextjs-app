@@ -81,3 +81,42 @@ jobs:
         #run: |
           #docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image_tag }} \
             #${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+# If deployment fails, trigger failure notification
+  notify_failure:
+    name: Lab NextJS Deploy Failure
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Lab NextJS Deploy Failure
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "❌ NextJS Deployment Failed: ${{ github.repository }}"
+          body: "The deployment of ${{ github.repository }} failed. Check logs for details."
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          content_type: text/html
+
+  # If deployment is successful, trigger success notification
+  notify_success:
+    name: Lab NextJS Deploy Success
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: ${{ success() }}
+    steps:
+      - name: Lab NextJS Deploy Success
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "✅ NextJS Deployment Successful: ${{ github.repository }}"
+          body: "The deployment of ${{ github.repository }} was successful."
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          content_type: text/html
