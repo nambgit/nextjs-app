@@ -68,8 +68,8 @@ jobs:
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
-          docker stop ${{ env.INSTANCE_NAME }} || true
-          docker rm ${{ env.INSTANCE_NAME }} || true
+          docker stop ${{ env.INSTANCE_NAME }} &> /dev/null
+          docker rm ${{ env.INSTANCE_NAME }} &> /dev/null
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
