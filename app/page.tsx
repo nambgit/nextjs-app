@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          First Deployment
+          Deployment 02
           </a>
         </div>
       </main>
