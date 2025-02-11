@@ -20,7 +20,7 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
+      image_tag: ${{ steps.tag.outputs.image_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image-tag }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
 
   deploy:
@@ -67,17 +67,17 @@ jobs:
         run: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           docker stop ${{ env.INSTANCE_NAME }} &> /dev/null
           docker rm ${{ env.INSTANCE_NAME }} &> /dev/null
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image-tag }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           EOF
 
       - name: Update Latest Tag
         if: ${{ github.event.inputs.rollback_tag == '' }}
         run: |
-          docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image-tag }} \
+          docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image_tag }} \
             ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
