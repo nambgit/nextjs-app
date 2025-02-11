@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Deployment 02
+          Add Deployment Notification Email
           </a>
         </div>
       </main>
