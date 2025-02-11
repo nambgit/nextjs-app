@@ -64,7 +64,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Instance
-        script: |
+        run: |
           ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
@@ -74,6 +74,7 @@ jobs:
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
             ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
+          EOF
 
       - name: Update Latest Tag
         if: ${{ github.event.inputs.rollback_tag == '' }}
