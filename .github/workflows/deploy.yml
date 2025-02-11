@@ -12,7 +12,7 @@ on:
 env:
   DOCKER_REGISTRY: docker.io
   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  REPOSITORY: ${{ env.DOCKERHUB_USERNAME }}/lab-nextjs
+  REPOSITORY: ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
   INSTANCE_NAME: lab-nextjs
   IMAGE_NAME: lab-nextjs
 
