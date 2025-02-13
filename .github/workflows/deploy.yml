@@ -92,7 +92,7 @@ jobs:
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest02
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
           EOF
 
   rollback:

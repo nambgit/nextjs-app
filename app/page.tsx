@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Add SNYK Scan Docker Image
+          Update Rollback flow on GitHub Actions
           </a>
         </div>
       </main>
