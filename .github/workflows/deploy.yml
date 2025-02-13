@@ -85,11 +85,12 @@ jobs:
             ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           EOF
 
-      #- name: Update Latest Tag
-        #if: ${{ github.event.inputs.rollback_tag == '' }}
-        #run: |
-          #docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image_tag }} \
-            #${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+      - name: Update Latest Tag
+        if: ${{ github.event.inputs.rollback_tag == '' }}
+        run: |
+          docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image_tag }} \
+            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+            
 # If deployment fails, trigger failure notification
   notify_failure:
     name: Lab NextJS Deploy Failure
