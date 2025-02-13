@@ -1,0 +1,139 @@
+# Deployment with Version Control to Rollback
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - develop
+    tags:
+      - [ 'v*.*.*' ] # Semantic Versioning trigger
+  workflow_dispatch: # Manual trigger for rollback
+      inputs:
+        rollback-version:
+          description: 'Version to rollback to (e.g., v1.2.3)'
+          required: false
+
+env:
+  DOCKER_REGISTRY: docker.io
+  IMAGE_IMAGE: lab-nextjs
+  STACK_NAME: nextjs-stack
+  DEPLOY_HISTORY_FILE: deploy-history.txt
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      
+      - name: Docker Hub Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Versioned Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github-actions-key
+          chmod 600 ~/.ssh/github-actions-key
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Version
+        run: |
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
+          ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
+          docker stop ${{ env.INSTANCE_NAME }} &> /dev/null
+          docker rm ${{ env.INSTANCE_NAME }} &> /dev/null
+          docker run -d \
+            --name ${{ env.INSTANCE_NAME }} \
+            -p 3000:3000 \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
+          EOF
+
+      - name: Record Deployment
+        run: |
+          echo "$(date + %Y-%m-%dT%H:%M:%S),${{ env.VERSION }},${{ github.run_id }}" >> ${{ env.DEPLOY_HISTORY_FILE }}
+          gh artifact upload ${{ env.DEPLOY_HISTORY_FILE }} --repo ${{ github.repository }}
+
+  verify-and-rollback:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Health Check
+        run: |
+          # Add your application health check logic here
+          curl -sSf http://localhost:3000 || exit 1
+
+      - name: Rollback on Failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: artifacts } = await github.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const historyArtifact = artifacts.find(a => a.name === '${{ env.DEPLOY_HISTORY_FILE }}');
+            const downloadUrl = await github.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: historyArtifact.id,
+              archive_format: 'zip'
+            });
+
+            // Extract previous deployment version
+            const previousVersion = ...; // Logic to get previous version
+
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: '${{ github.workflow }}',
+              ref: 'develop',
+              inputs: {
+                rollback_version: previousVersion
+              }
+            });
+  rollback:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.rollback_version != '' }}
+    steps:
+      - name: Validate Rollback Version
+        run: |
+          if ! [[ "${{ github.event.inputs.rollback_version }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format. Please provide a valid version in the format v1.2.3"
+            exit 1
+          fi
+
+      - name: Rollback Deployment
+        run: |
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no \
+          ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ github.event.inputs.rollback_version }}
+          docker stop ${{ env.INSTANCE_NAME }} &> /dev/null
+          docker rm ${{ env.INSTANCE_NAME }} &> /dev/null
+          docker run -d \
+            --name ${{ env.INSTANCE_NAME }} \
+            -p 3000:3000 \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ github.event.inputs.rollback_version }}
+          EOF
