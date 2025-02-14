@@ -88,12 +88,12 @@ jobs:
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           docker stop ${{ env.INSTANCE_NAME }} || true
           docker rm ${{ env.INSTANCE_NAME }} || true
-          docker rmi ${{ env.REPOSITORY }}:latest
-          docker pull ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:latest
+          docker rmi ${{ env.REPOSITORY }}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           EOF
 
   rollback:
