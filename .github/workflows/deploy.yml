@@ -67,7 +67,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:$image_tag
+            ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:${{ steps.tag.outputs.image_tag }}
             ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:latest
       #- name: Build Docker Image
         #run: |
