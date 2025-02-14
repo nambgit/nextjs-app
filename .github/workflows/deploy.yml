@@ -84,11 +84,11 @@ jobs:
             -p 3000:3000 \
             ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
           EOF
-      #- name: Update Latest Tag
-        #if: ${{ github.event.inputs.rollback_tag == '' }}
-        #run: |
-          #docker tag ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }} \
-            #${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
+      - name: Update Latest Tag
+        if: ${{ github.event.inputs.rollback_tag == '' }}
+        run: |
+          docker tag ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }} \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
 
   rollback:
     name: Rollback if Deploy Fails
