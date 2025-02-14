@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          Update Rollback flow on GitHub Actions with new source 02
+          Update Rollback flow on GitHub Actions with new source 04
           </a>
         </div>
       </main>
