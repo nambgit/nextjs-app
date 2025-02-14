@@ -86,8 +86,8 @@ jobs:
       - name: Update Latest Tag
         if: ${{ github.event.inputs.rollback_tag == '' }}
         run: |
-          docker tag ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ needs.build-push.outputs.image_tag }} \
-            ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }} \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
 
   rollback:
     name: Rollback if Deploy Fails
