@@ -93,7 +93,7 @@ jobs:
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
             -p 3000:3000 \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.build-push.outputs.image_tag }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
           EOF
 
   rollback:
