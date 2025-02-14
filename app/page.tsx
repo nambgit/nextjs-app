@@ -45,7 +45,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-          CHECK ROLLBACK PROGRESS
+          WELCOME TO
           </a>
         </div>
       </main>
