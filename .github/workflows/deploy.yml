@@ -88,7 +88,7 @@ jobs:
           ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           docker stop ${{ env.INSTANCE_NAME }} || true
           docker rm ${{ env.INSTANCE_NAME }} || true
-          docker rmi ${{ env.REPOSITORY }}
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/lab-nextjs || true
           docker pull ${{ secrets.DOCKER_USERNAME }}/lab-nextjs
           docker run -d \
             --name ${{ env.INSTANCE_NAME }} \
