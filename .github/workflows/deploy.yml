@@ -45,7 +45,7 @@ jobs:
 
       - name: Generate Tag
         id: tag
-        run: echo "image_tag=$(date +%Y%m%d%H%M%S)-${{ github.sha }}" >> $GITHUB_ENV
+        run: echo "image_tag=$(date +%Y%m%d%H%M%S)-${{ github.sha }}" >> $GITHUB_OUTPUT
         #run: |
           #if [ "${{ github.event.inputs.rollback_tag }}" == "" ]; then
             #echo "image_tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -61,14 +61,16 @@ jobs:
           #tags: |
             #${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
             #${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
+
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:${{ steps.tag.outputs.image_tag }}
-            ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:latest
+            ${{ env.DOCKER_REGISTRY}}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ env.REPOSITORY }}:latest
+
       #- name: Build Docker Image
         #run: |
           #docker build -t ${{ secrets.DOCKER_USERNAME }}/lab-nextjs:latest .
