@@ -45,22 +45,13 @@ jobs:
 
       - name: Generate Tag
         id: tag
-        run: echo "image_tag=$(date +%Y%m%d%H%M%S)-${{ github.sha }}" >> $GITHUB_OUTPUT
+        run: echo "image_tag=$(date +%Y%m%d%H%M%S)-${{ github.sha }}" >> $GITHUB_ENV
         #run: |
           #if [ "${{ github.event.inputs.rollback_tag }}" == "" ]; then
             #echo "image_tag=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           #else
             #echo "image_tag=${{ github.event.inputs.rollback_tag }}" >> $GITHUB_OUTPUT
           #fi
-      #- name: Build and Push
-        #if: ${{ github.event.inputs.rollback_tag == '' }}
-        #uses: docker/build-push-action@v4
-        #with:
-          #context: .
-          #push: true
-          #tags: |
-            #${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:${{ steps.tag.outputs.image_tag }}
-            #${{ env.DOCKER_REGISTRY }}/${{ env.REPOSITORY }}:latest
 
       - name: Build Docker Image
         run: |
